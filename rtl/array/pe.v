@@ -1,4 +1,4 @@
-module processingElement (input wire signed [7:0] in1, input wire signed [7:0] in2, input wire clk, input wire reset, input wire enable, output reg signed [31:0] out);
+module processingElement (input wire signed [7:0] a_in, input wire signed [7:0] b_in, input wire clk, input wire reset, input wire enable, output reg signed [31:0] out, output reg signed [7:0] a_pass, output reg signed [7:0] b_pass);
     
     reg signed [15:0] product;
     parameter MAX_VALUE = 32'h7FFFFFFF;
@@ -8,15 +8,19 @@ module processingElement (input wire signed [7:0] in1, input wire signed [7:0] i
     begin
         if (reset) begin
             out <= 0;
+            a_pass <= 0;
+            b_pass <= 0;
         end
         else if (enable) begin
-            product = in1 * in2;
+            product = a_in * b_in;
             if (out + product > MAX_VALUE)
                 out <= MAX_VALUE;
             else if (out + product < MIN_VALUE)
                 out <= MIN_VALUE;
             else
                 out <= out + product;
+            a_pass <= a_in;
+            b_pass <= b_in;
         end
     end
 

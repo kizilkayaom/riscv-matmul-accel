@@ -16,20 +16,26 @@ async def test_pe(dut):
 
     # Pair 1
     dut.enable.value = 1
-    dut.in1.value = 5
-    dut.in2.value = 7
+    dut.a_in.value = 5
+    dut.b_in.value = 7
     await RisingEdge(dut.clk)
     expected = 5 * 7
     await Timer(1, unit="ns")
     assert dut.out.value == expected, f"Expected: {expected}, got {dut.out.value}"
 
+    assert dut.a_pass.value == 5
+    assert dut.b_pass.value == 7
+
     # Pair 2
-    dut.in1.value = 3
-    dut.in2.value = 4
+    dut.a_in.value = 3
+    dut.b_in.value = 4
     await RisingEdge(dut.clk)
     expected += 3 * 4
     await Timer(1, unit="ns")
     assert dut.out.value == expected, f"Expected: {expected}, got {dut.out.value}"
+
+    assert dut.a_pass.value == 3
+    assert dut.b_pass.value == 4
 
     # Reset before Pair 3
     dut.reset.value = 1
@@ -38,12 +44,15 @@ async def test_pe(dut):
     dut.reset.value = 0
 
     # Pair 3 - Neg x Pos
-    dut.in1.value = -64
-    dut.in2.value = 32
+    dut.a_in.value = -64
+    dut.b_in.value = 32
     await RisingEdge(dut.clk)
     expected = -64 * 32
     await Timer(1, unit="ns")
     assert dut.out.value.to_signed() == expected, f"Expected: {expected}, got {dut.out.value}"
+
+    assert dut.a_pass.value.to_signed() == -64
+    assert dut.b_pass.value.to_signed() == 32
 
     # Reset before Pair 4
     dut.reset.value = 1
@@ -52,8 +61,8 @@ async def test_pe(dut):
     dut.reset.value = 0
 
     # Pair 4 - Neg x Neg
-    dut.in1.value = -128
-    dut.in2.value = -128
+    dut.a_in.value = -128
+    dut.b_in.value = -128
     await RisingEdge(dut.clk)
     expected = -128 * -128
     await Timer(1, unit="ns")
