@@ -1,7 +1,7 @@
 module processingElement (input wire signed [7:0] a_in, input wire signed [7:0] b_in, input wire clk, input wire reset, input wire enable, output reg signed [31:0] out, output reg signed [7:0] a_pass, output reg signed [7:0] b_pass);
     
     reg signed [15:0] product;
-    parameter MAX_VALUE = 32'h7FFFFFFF;
+    parameter signed [31:0] MAX_VALUE = 32'sh7FFFFFFF;
     parameter MIN_VALUE = 32'sh80000000;
 
     always @(posedge clk or posedge reset) 
