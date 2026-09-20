@@ -2,6 +2,7 @@ import cocotb
 from cocotb.triggers import Timer
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge
+from cocotb.triggers import FallingEdge
 
 @cocotb.test()
 async def test_pe(dut):
@@ -67,3 +68,71 @@ async def test_pe(dut):
     expected = -128 * -128
     await Timer(1, unit="ns")
     assert dut.out.value == expected, f"Expected: {expected}, got {dut.out.value}"
+
+    # Reset before Pair 5
+    dut.reset.value = 1
+    await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")
+    dut.reset.value = 0
+
+    # Pair 5 - Accumulator Saturation Test 1
+    dut.out.value = 2147483647
+    dut.a_in.value = 1
+    dut.b_in.value = 1
+    dut.enable.value = 1
+
+    await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")
+
+    assert dut.out.value.to_signed() == 2147483647
+
+    # Reset before Pair 6
+    dut.reset.value = 1
+    await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")
+    dut.reset.value = 0
+
+    # Pair 6 - Accumulator Saturation Test 2
+    dut.out.value = -2147483648
+    dut.a_in.value = -1
+    dut.b_in.value = 1
+    dut.enable.value = 1
+
+    await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")
+
+    assert dut.out.value.to_signed() == -2147483648
+
+    # Reset before Pair 7
+    dut.reset.value = 1
+    await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")
+    dut.reset.value = 0
+
+    # Pair 7 - Accumulator Saturation Test 3
+    dut.out.value = 2147483647
+    dut.a_in.value = -1
+    dut.b_in.value = 1
+    dut.enable.value = 1
+
+    await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")
+
+    assert dut.out.value.to_signed() == 2147483646
+
+    # Reset before Pair 8
+    dut.reset.value = 1
+    await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")
+    dut.reset.value = 0
+
+    # Pair 8 - Accumulator Saturation Test 4
+    dut.out.value = -2147483648
+    dut.a_in.value = 1
+    dut.b_in.value = 1
+    dut.enable.value = 1
+
+    await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")
+
+    assert dut.out.value.to_signed() == -2147483647

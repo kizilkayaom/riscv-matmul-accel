@@ -1,5 +1,7 @@
 .venv/
 __pycache__/
 *.pyc
+*.f
+*.vvp
 sim_build/
 results.xml

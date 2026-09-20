@@ -2,7 +2,8 @@ module processingElement (input wire signed [7:0] a_in, input wire signed [7:0] 
     
     reg signed [15:0] product;
     parameter signed [31:0] MAX_VALUE = 32'sh7FFFFFFF;
-    parameter MIN_VALUE = 32'sh80000000;
+    parameter signed [31:0] MIN_VALUE = 32'sh80000000;
+    reg signed [32:0] sum;
 
     always @(posedge clk or posedge reset) 
     begin
@@ -13,12 +14,13 @@ module processingElement (input wire signed [7:0] a_in, input wire signed [7:0] 
         end
         else if (enable) begin
             product = a_in * b_in;
-            if (out + product > MAX_VALUE)
+            sum = $signed({out[31], out}) + $signed({{17{product[15]}}, product});
+            if (sum > MAX_VALUE)
                 out <= MAX_VALUE;
-            else if (out + product < MIN_VALUE)
+            else if (sum < MIN_VALUE)
                 out <= MIN_VALUE;
             else
-                out <= out + product;
+                out <= sum;
             a_pass <= a_in;
             b_pass <= b_in;
         end
