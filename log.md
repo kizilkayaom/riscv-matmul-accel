@@ -53,3 +53,37 @@ To run the array regression, execute these commands from `tb/` with the virtual 
 PYTHONPATH=.. TEST_SEED=42 NUM_CASES=10000 make
 PYTHONPATH=.. TEST_SEED=123 NUM_CASES=10000 make
 ```
+
+# Sep 21-22, 2026
+
+## Array control verification
+
+- Made stalls optional and extracted the accumulator-hold checks into `pause_array`.
+- Ran each random matrix pair uninterrupted and with a two-cycle stall after Cycle 0 on seeds `42` and `123`, and each passed 7 directed cases and 20,000 random executions (10,000 matrix pairs per seed).
+- Expanded the regression to stall after Cycle 0, 1, or 2, for 1, 2, or 5 clock cycles. Each matrix pair now runs ten times: once uninterrupted and once for each of the nine stall combinations.
+- The expanded regression passed 7 directed cases and 1,000 random executions with seed `42` (100 matrix pairs). Hold assertions check all four accumulators during each disabled edge, and the final outputs are compared against the golden model.
+- Added a separate reset-interruption test. It starts a multiplication, confirms nonzero output, asserts asynchronous reset after Cycle 0, and checks that outputs clear before the next rising edge. A fresh multiplication using different matrices then passes without an additional reset.
+- Added `reset_before` to the matrix helper so the recovery test can avoid masking a reset problem with a second reset.
+
+## Golden-model regression
+
+- Added standalone `unittest` tests for all three hand-verified arithmetic cases, using hard-coded expected results.
+- Added positive and negative accumulator saturation tests using long dot products.
+- Added recovery tests that reach each saturation limit and then add an opposite-sign product. These verify that saturation occurs after each addition and that the accumulator can move away from either limit.
+- Moved input arrays into their respective test methods to avoid shared mutable test data and simplify naming.
+- All seven golden-model tests pass.
+
+## Test commands
+
+From the repository root, with the virtual environment active:
+
+```sh
+python -m unittest discover -s model -p 'test_*.py'
+```
+
+From `tb/`, run the expanded array regression and reset-interruption test:
+
+```sh
+PYTHONPATH=.. TEST_SEED=42 NUM_CASES=100 make
+```
+
