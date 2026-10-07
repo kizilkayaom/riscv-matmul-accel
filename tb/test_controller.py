@@ -1,3 +1,5 @@
+# Check matrix scheduling, completion, and restart behavior.
+
 import os
 import cocotb
 import numpy as np
@@ -123,6 +125,7 @@ async def test_controller(dut):
 
     
 def pack_matrix(matrix):
+    # Pack row-major bytes, lowest byte first.
     packed = 0
     for index, value in enumerate(matrix.flat):
         packed |= (int(value) & 0xFF) << (8 * index)
@@ -220,13 +223,17 @@ async def run_controller_case(dut, A, B, case_id):
     assert int(dut.busy.value) == 1, f"{case_id}: start not accepted"
     assert int(dut.done.value) == 0, f"{case_id}: done did not clear"
 
-    for _ in range(10):
+    for cycle in range(1, 6):
         await RisingEdge(dut.clk)
         await Timer(1, unit="ns")
-        if int(dut.done.value) == 1:
-            break
-    else:
-        assert False, f"{case_id}: controller did not finish within 10 cycles"
+
+        expected_done = int(cycle == 5)
+        assert int(dut.done.value) == expected_done, (
+            f"{case_id}: unexpected done at cycle {cycle}"
+        )
+        assert int(dut.busy.value) == 1 - expected_done, (
+            f"{case_id}: unexpected busy at cycle {cycle}"
+        )
 
     assert int(dut.busy.value) == 0, f"{case_id}: busy remained high after completion"
 

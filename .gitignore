@@ -5,3 +5,11 @@ __pycache__/
 *.vvp
 sim_build/
 results.xml
+*.elf
+/tb/sim_build*/
+/firmware/matmul.hex
+/firmware/benchmark_accel.hex
+/firmware/benchmark_sw.hex
+/firmware/benchmark_mul.hex
+/firmware/benchmark_c.hex
+/build/

@@ -1,3 +1,5 @@
+// Accumulate signed byte products with 32-bit saturation.
+
 module processingElement (input wire signed [7:0] a_in, input wire signed [7:0] b_in, input wire clk, input wire reset, input wire enable, output reg signed [31:0] out, output reg signed [7:0] a_pass, output reg signed [7:0] b_pass);
     
     reg signed [15:0] product;
@@ -14,6 +16,7 @@ module processingElement (input wire signed [7:0] a_in, input wire signed [7:0] 
         end
         else if (enable) begin
             product = a_in * b_in;
+            // Keep overflow before clamping.
             sum = $signed({out[31], out}) + $signed({{17{product[15]}}, product});
             if (sum > MAX_VALUE)
                 out <= MAX_VALUE;
@@ -21,6 +24,7 @@ module processingElement (input wire signed [7:0] a_in, input wire signed [7:0] 
                 out <= MIN_VALUE;
             else
                 out <= sum;
+            // Forward operands with accumulation.
             a_pass <= a_in;
             b_pass <= b_in;
         end

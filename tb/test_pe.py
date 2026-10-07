@@ -1,3 +1,5 @@
+# Check signed accumulation, operand forwarding, and saturation.
+
 import cocotb
 from cocotb.triggers import Timer
 from cocotb.clock import Clock
@@ -9,7 +11,7 @@ async def test_pe(dut):
     
     cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
 
-    # Reset the clock
+    # Reset the accumulator
     dut.reset.value = 1
     dut.enable.value = 0
     await RisingEdge(dut.clk)

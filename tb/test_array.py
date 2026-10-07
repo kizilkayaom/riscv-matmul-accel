@@ -1,3 +1,5 @@
+# Check array arithmetic, stalls, and reset behavior.
+
 import os
 import cocotb
 import numpy as np
@@ -11,6 +13,7 @@ B = np.array([[64, -64], [127, 32]], dtype=np.int8)
 
 
 def get_result(dut, r, c, N=2):
+    # Extract one row-major result.
     idx = (r * N + c) * 32
     val = (int(dut.out.value) >> idx) & 0xFFFFFFFF
     if val >= 0x80000000:

@@ -1,3 +1,5 @@
+// Schedule a packed 2x2 matrix multiply.
+
 module controller (
     input wire clk,
     input wire reset,
@@ -65,12 +67,14 @@ assign busy = (state == CLEAR) ||
 
 assign done = (state == DONE);
 
+// Clear sums before each operation.
 assign array_reset = reset || (state == CLEAR);
 
 assign array_enable = !reset &&
                       ((state == STEP0) || (state == STEP1) ||
                        (state == STEP2) || (state == STEP3));
 
+// Skew inputs; STEP3 drains zeros.
 always @(*) begin
     array_a = 16'b0;
     array_b = 16'b0;

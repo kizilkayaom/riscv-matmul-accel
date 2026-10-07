@@ -1,3 +1,5 @@
+# Check reference arithmetic, saturation, and input dimensions.
+
 import unittest
 import numpy as np
 from model.golden_model import model

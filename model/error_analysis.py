@@ -1,3 +1,5 @@
+# Measure Q1.7 quantization error against floating-point multiplication.
+
 import numpy as np
 
 from model.golden_model import model

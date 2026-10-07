@@ -1,3 +1,5 @@
+# Check the basic unsigned adder.
+
 import cocotb
 from cocotb.triggers import Timer
 

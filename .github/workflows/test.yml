@@ -1,0 +1,45 @@
+# Run regression tests and publish benchmark reports.
+
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+          cache: pip
+
+      - name: Install simulator and firmware toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make iverilog gcc-riscv64-unknown-elf binutils-riscv64-unknown-elf
+
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run full regression
+        run: make test CC=riscv64-unknown-elf-gcc OBJCOPY=riscv64-unknown-elf-objcopy
+
+      - name: Run accelerator and software benchmarks
+        run: make benchmark CC=riscv64-unknown-elf-gcc OBJCOPY=riscv64-unknown-elf-objcopy
+
+      - name: Upload benchmark reports
+        uses: actions/upload-artifact@v7
+        with:
+          name: benchmark-reports
+          path: build/benchmark/
+          if-no-files-found: error
